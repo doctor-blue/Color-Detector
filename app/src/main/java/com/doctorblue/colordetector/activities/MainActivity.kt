@@ -2,20 +2,24 @@ package com.doctorblue.colordetector.activities
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.doctorblue.colordetector.R
 import com.doctorblue.colordetector.base.BaseActivity
-import com.doctorblue.colordetector.model.Color
+import com.doctorblue.colordetector.handler.ColorDetectHandler
+import com.doctorblue.colordetector.utils.timer
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -42,6 +46,10 @@ class MainActivity : BaseActivity() {
 
     // Select back camera as a default
     private var cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+    private val colorDetectHandler = ColorDetectHandler()
+
+    private var timerTask: Job? = null
 
 
     override fun getLayoutId(): Int = R.layout.activity_main
@@ -84,11 +92,12 @@ class MainActivity : BaseActivity() {
     }
 
 
-
-
     private fun startCamera() {
 
         cameraProviderFuture.addListener({
+
+            timerTask?.cancel()
+
             // Preview
             val preview = Preview.Builder()
                 .build()
@@ -96,20 +105,23 @@ class MainActivity : BaseActivity() {
                     it.setSurfaceProvider(camera_preview.createSurfaceProvider())
                 }
 
-            val imageAnalyzer = ImageAnalysis.Builder()
-                .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor, ColorAnalyzer { color ->
-                        Log.d(TAG, "Average luminosity: $color")
-                    })
+            timerTask = CoroutineScope(Dispatchers.Default).timer(1000) {
+                val color = colorDetectHandler.detect(camera_preview, pointer)
+                Log.d(TAG, "Color : ${color.hex}")
+
+                withContext(Dispatchers.Main) {
+                    txt_hex.text = color.hex
+                    card_color.setBackgroundColor(Color.parseColor(color.hex))
                 }
+            }
+
             try {
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
 
                 // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageAnalyzer
+                    this, cameraSelector, preview
                 )
 
             } catch (exc: Exception) {
@@ -143,15 +155,5 @@ class MainActivity : BaseActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private class ColorAnalyzer(private val listener: (Color) -> Unit) : ImageAnalysis.Analyzer {
 
-        override fun analyze(image: ImageProxy) {
-
-            //for test
-            val color = Color()
-            listener(color)
-
-            image.close()
-        }
-    }
 }
