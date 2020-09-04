@@ -2,9 +2,11 @@ package com.doctorblue.colordetector.activities
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
@@ -22,6 +24,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+
 
 class MainActivity : BaseActivity() {
 
@@ -51,6 +54,7 @@ class MainActivity : BaseActivity() {
 
     private var timerTask: Job? = null
 
+    private var screenWidth = Resources.getSystem().displayMetrics.widthPixels
 
     override fun getLayoutId(): Int = R.layout.activity_main
 
@@ -65,7 +69,10 @@ class MainActivity : BaseActivity() {
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+
     }
+
 
     override fun initEvents() {
 
@@ -130,6 +137,50 @@ class MainActivity : BaseActivity() {
 
         }, ContextCompat.getMainExecutor(this))
     }
+
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        event?.let {
+            val x = event.x
+
+            val y = when {
+                event.y < guideline_top.y -> guideline_top.y
+                event.y > guideline_bottom1.y -> guideline_bottom1.y - pointer.height
+                else -> event.y
+            }
+
+            setPointerCoordinates(x, y)
+
+
+        }
+
+        return super.onTouchEvent(event)
+    }
+
+    private fun setPointerCoordinates(x: Float, y: Float) {
+
+        pointer.x = x
+        pointer.y = y
+
+        val marginBottom = this.resources.getDimension(R.dimen._20sdp)
+        card_color_preview.y = y - marginBottom - pointer.height
+
+
+        val cardColorPreviewX = when {
+            x < guideline_left.x ->
+                x
+            x >= guideline_right.x -> {
+                x - card_color_preview.width
+            }
+            else ->
+                x - (card_color_preview.width / 2)
+        }
+
+        card_color_preview.x = cardColorPreviewX
+
+
+    }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
