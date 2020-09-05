@@ -16,6 +16,7 @@ class ColorDetectHandler {
     private var hex: String = ""
 
     private var name: String = ""
+
     private var h: String = ""
     private var s: String = ""
     private var l: String = ""
@@ -64,6 +65,48 @@ class ColorDetectHandler {
         // Get hex code of RGB
         hex = "#" + Integer.toHexString(rgb and 0x00ffffff)
 
+
+        return com.doctorblue.colordetector.model.Color(
+            hex,
+            red.toString(),
+            green.toString(),
+            blue.toString(),
+        )
+    }
+
+    fun detect(
+        bitmap: Bitmap,
+        pointer: View,
+        marginTop: Float,
+        marginLeft: Float,
+        ratio: Float
+    ): com.doctorblue.colordetector.model.Color {
+
+        // Reset data
+        reset()
+
+        // Get the coordinate of pointer
+        // Add half of width and half of height to x and y
+        // to be able to target the center of the pointer
+        val x = (pointer.x + (pointer.width / 2).toFloat() - marginLeft) * ratio
+        val y = (pointer.y + (pointer.height / 2).toFloat() - marginTop) * ratio
+        // Get the pixel of pointer using its x and y coordinate
+
+
+        val pixel = bitmap.getPixel(x.toInt(), y.toInt())
+
+        // Get RGB - r (red), g (green) and b (blue) - colors of the pixel
+        red = Color.red(pixel)
+        green = Color.green(pixel)
+        blue = Color.blue(pixel)
+
+        // This is the color which can be used to set color of something directly
+        // # Example: set an image view's color
+        // # ImageView.setBackgroundColor(rgb)
+        rgb = Color.rgb(red, green, blue)
+
+        // Get hex code of RGB
+        hex = "#" + Integer.toHexString(rgb and 0x00ffffff)
 
         return com.doctorblue.colordetector.model.Color(
             hex,

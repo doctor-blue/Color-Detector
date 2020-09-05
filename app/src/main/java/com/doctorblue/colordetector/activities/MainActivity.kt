@@ -1,18 +1,25 @@
 package com.doctorblue.colordetector.activities
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Resources
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
+import android.view.View
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.doctorblue.colordetector.R
 import com.doctorblue.colordetector.base.BaseActivity
 import com.doctorblue.colordetector.handler.ColorDetectHandler
@@ -32,7 +39,9 @@ class MainActivity : BaseActivity() {
         private const val TAG = "CameraXBasic"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 26
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private val REQUIRED_PERMISSIONS =
+            arrayOf(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
+        private const val REQUEST_CODE = 112
     }
 
     private lateinit var cameraExecutor: ExecutorService
@@ -54,7 +63,10 @@ class MainActivity : BaseActivity() {
 
     private var timerTask: Job? = null
 
-    private var screenWidth = Resources.getSystem().displayMetrics.widthPixels
+    private var currentColor = com.doctorblue.colordetector.model.Color()
+
+    private var isImageShown = false
+
 
     override fun getLayoutId(): Int = R.layout.activity_main
 
@@ -95,6 +107,20 @@ class MainActivity : BaseActivity() {
             startCamera()
         }
 
+        btn_pick_image.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            startActivityForResult(intent, REQUEST_CODE)
+        }
+
+        btn_show_camera.setOnClickListener {
+            if (isImageShown) {
+                btn_show_camera.visibility = View.GONE
+                image_view.visibility = View.GONE
+                isImageShown = false
+                startCamera()
+            }
+        }
 
     }
 
@@ -113,12 +139,12 @@ class MainActivity : BaseActivity() {
                 }
 
             timerTask = CoroutineScope(Dispatchers.Default).timer(1000) {
-                val color = colorDetectHandler.detect(camera_preview, pointer)
-                Log.d(TAG, "Color : ${color.hex}")
+                currentColor = colorDetectHandler.detect(camera_preview, pointer)
+                Log.d(TAG, "Color : ${currentColor.hex}")
 
                 withContext(Dispatchers.Main) {
-                    txt_hex.text = color.hex
-                    card_color.setBackgroundColor(Color.parseColor(color.hex))
+                    txt_hex.text = currentColor.hex
+                    card_color.setBackgroundColor(Color.parseColor(currentColor.hex))
                 }
             }
 
@@ -181,6 +207,86 @@ class MainActivity : BaseActivity() {
 
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE) {
+
+            if (!isImageShown) {
+                image_view.visibility = View.VISIBLE
+                btn_show_camera.visibility = View.VISIBLE
+                isImageShown = true
+            }
+
+
+            Glide.with(this)
+                .asBitmap()
+                .load(data?.data)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
+                        image_view.setImageBitmap(resource)
+                        startDetectColorFromImage(resource)
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) = Unit
+                })
+        }
+    }
+
+    private fun startDetectColorFromImage(bitmap: Bitmap) {
+
+        cameraProvider.unbindAll()
+
+        timerTask?.cancel()
+
+        /*  For debugging
+          val w = image_view.width
+          val h = image_view.height
+          */
+
+        // Set Pointer Coordinates at center of image view
+        setPointerCoordinates(image_view.width / 2f, image_view.height / 2f)
+
+        /**
+         * At this point I don't know how to explain  this code.
+         * But I will definitely add it in the future
+         */
+        var isFitHorizontally = true
+
+        val ratio = if (bitmap.width >= bitmap.height) {
+            bitmap.width / (image_view.width * 1.0f)
+        } else {
+            isFitHorizontally = false
+            bitmap.height / (image_view.height * 1.0f)
+        }
+
+
+        var marginTop: Float = layout_top.height.toFloat()
+
+        var marginLeft = 0f
+
+        if (isFitHorizontally) {
+            marginTop += (image_view.height - bitmap.height / ratio) / 2
+        } else {
+            marginLeft += (image_view.width - bitmap.width / ratio) / 2
+        }
+
+        timerTask = CoroutineScope(Dispatchers.Default).timer(1000) {
+
+            currentColor =
+                colorDetectHandler.detect(bitmap, pointer, marginTop, marginLeft, ratio)
+            Log.d(TAG, "Color : ${currentColor.hex}")
+
+            withContext(Dispatchers.Main) {
+                txt_hex.text = currentColor.hex
+                card_color.setBackgroundColor(Color.parseColor(currentColor.hex))
+            }
+        }
+
+
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
