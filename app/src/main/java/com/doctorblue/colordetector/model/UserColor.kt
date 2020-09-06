@@ -1,6 +1,6 @@
 package com.doctorblue.colordetector.model
 
-class Color(
+class UserColor(
     var hex: String = "#000000",
     var r: String = "",
     var g: String = "",

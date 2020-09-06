@@ -77,11 +77,12 @@
             android:paddingStart="@dimen/_2sdp"
             android:paddingEnd="@dimen/_2sdp">
 
-            <View
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_color"
                 android:layout_width="@dimen/_15sdp"
                 android:layout_height="@dimen/_15sdp"
-                android:background="@color/default_color"/>
+                app:cardCornerRadius="@dimen/_8sdp"
+                app:cardBackgroundColor="@color/default_color"/>
 
             <TextView
                 android:id="@+id/txt_hex"
@@ -155,6 +156,7 @@
             app:layout_constraintBottom_toTopOf="@+id/guideline_bottom2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="@dimen/_10sdp"
             app:tint="@color/colorPrimary" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -163,6 +165,7 @@
             android:layout_height="0dp"
             android:layout_marginStart="@dimen/_5sdp"
             android:orientation="horizontal"
+            android:layout_marginTop="@dimen/_10sdp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/guideline_bottom2"
             app:layout_constraintEnd_toEndOf="parent"
@@ -174,7 +177,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.2" />
+            app:layout_constraintGuide_percent="0.3" />
 
 
         <ImageView

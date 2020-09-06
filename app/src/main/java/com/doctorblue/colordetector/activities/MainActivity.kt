@@ -17,12 +17,15 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.doctorblue.colordetector.R
+import com.doctorblue.colordetector.adapter.ColorAdapter
 import com.doctorblue.colordetector.base.BaseActivity
 import com.doctorblue.colordetector.handler.ColorDetectHandler
+import com.doctorblue.colordetector.model.UserColor
 import com.doctorblue.colordetector.utils.timer
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
@@ -63,9 +66,16 @@ class MainActivity : BaseActivity() {
 
     private var timerTask: Job? = null
 
-    private var currentColor = com.doctorblue.colordetector.model.Color()
+    private var currentColor = UserColor()
 
     private var isImageShown = false
+
+    private var currentColorList: MutableList<UserColor> =
+        mutableListOf()
+
+    private val colorAdapter: ColorAdapter by lazy {
+        ColorAdapter(this)
+    }
 
 
     override fun getLayoutId(): Int = R.layout.activity_main
@@ -82,6 +92,11 @@ class MainActivity : BaseActivity() {
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
+        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        rv_color.layoutManager = layoutManager
+        rv_color.setHasFixedSize(true)
+        rv_color.adapter = colorAdapter
+
 
     }
 
@@ -89,22 +104,23 @@ class MainActivity : BaseActivity() {
     override fun initEvents() {
 
         btn_pick_color.setOnClickListener {
-
+            addColor()
         }
         btn_add_list_color.setOnClickListener {
 
         }
 
         btn_change_camera.setOnClickListener {
-
-            if (isBackCamera) {
-                cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-                isBackCamera = false
-            } else {
-                cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-                isBackCamera = true
+            if (!isImageShown) {
+                if (isBackCamera) {
+                    cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+                    isBackCamera = false
+                } else {
+                    cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+                    isBackCamera = true
+                }
+                startCamera()
             }
-            startCamera()
         }
 
         btn_pick_image.setOnClickListener {
@@ -144,7 +160,7 @@ class MainActivity : BaseActivity() {
 
                 withContext(Dispatchers.Main) {
                     txt_hex.text = currentColor.hex
-                    card_color.setBackgroundColor(Color.parseColor(currentColor.hex))
+                    card_color.setCardBackgroundColor(Color.parseColor(currentColor.hex))
                 }
             }
 
@@ -176,8 +192,6 @@ class MainActivity : BaseActivity() {
             }
 
             setPointerCoordinates(x, y)
-
-
         }
 
         return super.onTouchEvent(event)
@@ -253,7 +267,12 @@ class MainActivity : BaseActivity() {
          * At this point I don't know how to explain  this code.
          * But I will definitely add it in the future
          */
+
         var isFitHorizontally = true
+
+        var marginTop: Float = layout_top.height.toFloat()
+
+        var marginLeft = 0f
 
         val ratio = if (bitmap.width >= bitmap.height) {
             bitmap.width / (image_view.width * 1.0f)
@@ -262,10 +281,6 @@ class MainActivity : BaseActivity() {
             bitmap.height / (image_view.height * 1.0f)
         }
 
-
-        var marginTop: Float = layout_top.height.toFloat()
-
-        var marginLeft = 0f
 
         if (isFitHorizontally) {
             marginTop += (image_view.height - bitmap.height / ratio) / 2
@@ -281,7 +296,7 @@ class MainActivity : BaseActivity() {
 
             withContext(Dispatchers.Main) {
                 txt_hex.text = currentColor.hex
-                card_color.setBackgroundColor(Color.parseColor(currentColor.hex))
+                card_color.setCardBackgroundColor(Color.parseColor(currentColor.hex))
             }
         }
 
@@ -310,6 +325,17 @@ class MainActivity : BaseActivity() {
         ContextCompat.checkSelfPermission(
             baseContext, it
         ) == PackageManager.PERMISSION_GRANTED
+    }
+
+
+    private fun addColor() {
+        currentColorList.add(0, currentColor)
+        colorAdapter.notifyData(currentColorList)
+    }
+
+    private fun clearColorList() {
+        currentColorList.clear()
+        colorAdapter.notifyData(currentColorList)
     }
 
 

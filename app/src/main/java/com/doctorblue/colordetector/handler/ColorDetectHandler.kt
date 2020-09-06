@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.view.View
 import androidx.camera.view.PreviewView
+import com.doctorblue.colordetector.model.UserColor
 import kotlin.math.max
 import kotlin.math.min
 
@@ -33,7 +34,7 @@ class ColorDetectHandler {
     }
 
 
-    fun detect(cameraView: PreviewView, pointer: View): com.doctorblue.colordetector.model.Color {
+    fun detect(cameraView: PreviewView, pointer: View): UserColor {
 
         // Reset all variables before to detect new color
         reset()
@@ -66,7 +67,7 @@ class ColorDetectHandler {
         hex = "#" + Integer.toHexString(rgb and 0x00ffffff)
 
 
-        return com.doctorblue.colordetector.model.Color(
+        return UserColor(
             hex,
             red.toString(),
             green.toString(),
@@ -80,7 +81,7 @@ class ColorDetectHandler {
         marginTop: Float,
         marginLeft: Float,
         ratio: Float
-    ): com.doctorblue.colordetector.model.Color {
+    ): UserColor {
 
         // Reset data
         reset()
@@ -108,7 +109,7 @@ class ColorDetectHandler {
         // Get hex code of RGB
         hex = "#" + Integer.toHexString(rgb and 0x00ffffff)
 
-        return com.doctorblue.colordetector.model.Color(
+        return UserColor(
             hex,
             red.toString(),
             green.toString(),
