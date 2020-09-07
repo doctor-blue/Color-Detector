@@ -74,7 +74,7 @@ class MainActivity : BaseActivity() {
         mutableListOf()
 
     private val colorAdapter: ColorAdapter by lazy {
-        ColorAdapter(this)
+        ColorAdapter(this,ColorAdapter.Geometry.SQUARE)
     }
 
 
