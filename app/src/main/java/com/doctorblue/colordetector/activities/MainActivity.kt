@@ -17,6 +17,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -24,6 +25,9 @@ import com.bumptech.glide.request.transition.Transition
 import com.doctorblue.colordetector.R
 import com.doctorblue.colordetector.adapter.ColorAdapter
 import com.doctorblue.colordetector.base.BaseActivity
+import com.doctorblue.colordetector.database.ColorViewModel
+import com.doctorblue.colordetector.dialog.ColorDialog
+import com.doctorblue.colordetector.fragments.ColorsFragment
 import com.doctorblue.colordetector.handler.ColorDetectHandler
 import com.doctorblue.colordetector.model.UserColor
 import com.doctorblue.colordetector.utils.timer
@@ -74,7 +78,17 @@ class MainActivity : BaseActivity() {
         mutableListOf()
 
     private val colorAdapter: ColorAdapter by lazy {
-        ColorAdapter(this,ColorAdapter.Geometry.SQUARE)
+        ColorAdapter(this)
+    }
+
+    private val colorsFragment: ColorsFragment by lazy {
+        ColorsFragment()
+    }
+    private val colorViewModel: ColorViewModel by lazy {
+        ViewModelProvider(
+            this,
+            ColorViewModel.ColorViewModelFactory(application)
+        )[ColorViewModel::class.java]
     }
 
 
@@ -97,7 +111,6 @@ class MainActivity : BaseActivity() {
         rv_color.setHasFixedSize(true)
         rv_color.adapter = colorAdapter
 
-
     }
 
 
@@ -107,7 +120,10 @@ class MainActivity : BaseActivity() {
             addColor()
         }
         btn_add_list_color.setOnClickListener {
-
+            if (currentColorList.isNotEmpty()) {
+                val colorDialog = ColorDialog(this, colorViewModel, colorAdapter,clearColorList)
+                colorDialog.show()
+            }
         }
 
         btn_change_camera.setOnClickListener {
@@ -136,6 +152,10 @@ class MainActivity : BaseActivity() {
                 isImageShown = false
                 startCamera()
             }
+        }
+
+        btn_show_colors.setOnClickListener {
+            showBottomSheetFragment()
         }
 
     }
@@ -329,13 +349,27 @@ class MainActivity : BaseActivity() {
 
 
     private fun addColor() {
-        currentColorList.add(0, currentColor)
+        try {
+            //Check color before add to list
+            Color.parseColor(currentColor.hex)
+            currentColorList.add(0, currentColor)
+            colorAdapter.notifyData(currentColorList)
+        } catch (e: IllegalArgumentException) {
+            Toast.makeText(
+                this,
+                resources.getString(R.string.unknown_color),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private val clearColorList:()->Unit = {
+        currentColorList.clear()
         colorAdapter.notifyData(currentColorList)
     }
 
-    private fun clearColorList() {
-        currentColorList.clear()
-        colorAdapter.notifyData(currentColorList)
+    private fun showBottomSheetFragment() {
+        colorsFragment.show(supportFragmentManager, colorsFragment.tag)
     }
 
 

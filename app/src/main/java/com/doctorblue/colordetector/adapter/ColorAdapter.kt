@@ -1,6 +1,7 @@
 package com.doctorblue.colordetector.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.doctorblue.colordetector.R
@@ -13,12 +14,14 @@ class ColorAdapter(
     private val onItemClick: (UserColor) -> Unit = {}
 ) :
     RecyclerView.Adapter<ColorAdapter.ColorViewHolder>() {
-    private var colors: List<UserColor> = listOf()
+    var colors: List<UserColor> = listOf()
 
-    class ColorViewHolder(private val cardView: ColorCardView) :
+    class ColorViewHolder(private val cardView: ColorCardView, private val context: Context) :
         RecyclerView.ViewHolder(cardView) {
         fun onBind(color: UserColor, onItemClick: (UserColor) -> Unit) {
-            cardView.setCardBackgroundColor(android.graphics.Color.parseColor(color.hex))
+
+            cardView.setCardBackgroundColor(Color.parseColor(color.hex))
+
             cardView.setOnClickListener { onItemClick(color) }
         }
     }
@@ -32,7 +35,7 @@ class ColorAdapter(
             cardView.radius = 0f
         }
 
-        return ColorViewHolder(cardView)
+        return ColorViewHolder(cardView, context)
     }
 
     override fun onBindViewHolder(holder: ColorViewHolder, position: Int) {

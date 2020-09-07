@@ -3,4 +3,8 @@
     <string name="color_default">#000000</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="dialog_color_title">What is your color list names?</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="unknown_color">Unknown Color</string>
 </resources>
