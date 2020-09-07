@@ -32,8 +32,9 @@ class ColorDialog(
             if (name.isNotEmpty()) {
                 colorAdapter.colors.forEach {
                     it.name = name
+                    colorViewModel.insertColor(it)
                 }
-                colorViewModel.insertAllColor(colorAdapter.colors)
+                //colorViewModel.insertAllColor(colorAdapter.colors)
                 onClearColor()
                 dismiss()
             }

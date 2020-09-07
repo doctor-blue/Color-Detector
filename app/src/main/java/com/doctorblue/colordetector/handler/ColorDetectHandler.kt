@@ -64,8 +64,12 @@ class ColorDetectHandler {
         rgb = Color.rgb(red, green, blue)
 
         // Get hex code of RGB
-        hex = "#" + Integer.toHexString(rgb and 0x00ffffff)
+        hex = Integer.toHexString(rgb and 0x00ffffff)
 
+        for (i in 0 until (6 - hex.length))
+            hex = "0$hex"
+
+        hex = "#$hex"
 
         return UserColor(
             hex,
@@ -107,7 +111,11 @@ class ColorDetectHandler {
         rgb = Color.rgb(red, green, blue)
 
         // Get hex code of RGB
-        hex = "#" + Integer.toHexString(rgb and 0x00ffffff)
+        hex = Integer.toHexString(rgb and 0x00ffffff)
+        for (i in 0 until (6 - hex.length))
+            hex = "0$hex"
+
+        hex = "#$hex"
 
         return UserColor(
             hex,

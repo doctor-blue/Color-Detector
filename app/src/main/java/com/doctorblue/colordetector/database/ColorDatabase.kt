@@ -19,7 +19,7 @@ abstract class ColorDatabase : RoomDatabase() {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         ColorDatabase::class.java,
-                        "MoonyDatabase.db"
+                        "ColorDatabase.db"
                     ).build()
                 }
             return instance!!
