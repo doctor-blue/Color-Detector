@@ -384,5 +384,11 @@ class MainActivity : BaseActivity() {
         colorAdapter.notifyData(currentColorList)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        timerTask?.cancel()
+        cameraProvider.unbindAll()
+        cameraExecutor.shutdown()
+    }
 
 }
