@@ -8,4 +8,5 @@
     <string name="ok">OK</string>
     <string name="unknown_color">Unknown Color</string>
     <string name="your_color">Your color</string>
+    <string name="remove">Remove</string>
 </resources>

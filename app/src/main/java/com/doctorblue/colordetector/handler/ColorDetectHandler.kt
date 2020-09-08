@@ -125,21 +125,27 @@ class ColorDetectHandler {
         )
     }
 
-    private fun convertRgbToHsl(red: Int, green: Int, blue: Int): IntArray {
+     fun convertRgbToHsl(color: UserColor) {
+        val red = color.r.toFloat()
+        val green = color.g.toFloat()
+        val blue = color.b.toFloat()
+
         val rgb = doubleArrayOf(
-            red.toFloat() / 255.toDouble(),
-            green.toFloat() / 255.toDouble(),
-            blue.toFloat() / 255
+            red / 255.toDouble(),
+            green / 255.toDouble(),
+            blue / 255
                 .toDouble()
         )
         val r = rgb[0]
         val g = rgb[1]
         val b = rgb[2]
+
         val min: Double
         val max: Double
         val delta: Double
         var s: Double
         val l: Double
+
         min = min(r, min(g, b))
         max = max(r, max(g, b))
         delta = max - min
@@ -154,10 +160,8 @@ class ColorDetectHandler {
             h /= 6.0
         }
         val factor = 255.0
-        return intArrayOf(
-            (h * factor).toInt(),
-            (s * factor).toInt(),
-            (l * factor).toInt()
-        )
+        color.h = (h * factor).toInt().toString()
+        color.s = (s * factor).toInt().toString()
+        color.l = (l * factor).toInt().toString()
     }
 }

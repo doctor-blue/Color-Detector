@@ -26,6 +26,7 @@ import com.doctorblue.colordetector.R
 import com.doctorblue.colordetector.adapter.ColorAdapter
 import com.doctorblue.colordetector.base.BaseActivity
 import com.doctorblue.colordetector.database.ColorViewModel
+import com.doctorblue.colordetector.dialog.ColorDetailDialog
 import com.doctorblue.colordetector.dialog.ColorDialog
 import com.doctorblue.colordetector.fragments.ColorsFragment
 import com.doctorblue.colordetector.handler.ColorDetectHandler
@@ -78,7 +79,10 @@ class MainActivity : BaseActivity() {
         mutableListOf()
 
     private val colorAdapter: ColorAdapter by lazy {
-        ColorAdapter(this)
+        ColorAdapter(this) {
+            val detailDialog = ColorDetailDialog(this, it, removeColorInList)
+            detailDialog.show()
+        }
     }
 
     private val colorsFragment: ColorsFragment by lazy {
@@ -121,7 +125,7 @@ class MainActivity : BaseActivity() {
         }
         btn_add_list_color.setOnClickListener {
             if (currentColorList.isNotEmpty()) {
-                val colorDialog = ColorDialog(this, colorViewModel, colorAdapter,clearColorList)
+                val colorDialog = ColorDialog(this, colorViewModel, colorAdapter, clearColorList)
                 colorDialog.show()
             }
         }
@@ -352,7 +356,10 @@ class MainActivity : BaseActivity() {
         try {
             //Check color before add to list
             Color.parseColor(currentColor.hex)
+
+            colorDetectHandler.convertRgbToHsl(currentColor)
             currentColorList.add(0, currentColor)
+
             colorAdapter.notifyData(currentColorList)
         } catch (e: IllegalArgumentException) {
             Toast.makeText(
@@ -363,13 +370,18 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private val clearColorList:()->Unit = {
+    private val clearColorList: () -> Unit = {
         currentColorList.clear()
         colorAdapter.notifyData(currentColorList)
     }
 
     private fun showBottomSheetFragment() {
         colorsFragment.show(supportFragmentManager, colorsFragment.tag)
+    }
+
+    private val removeColorInList: (UserColor) -> Unit = {
+        currentColorList.remove(it)
+        colorAdapter.notifyData(currentColorList)
     }
 
 

@@ -9,7 +9,7 @@
         android:id="@+id/txt_name_of_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/textColor"
         android:textSize="@dimen/_18sdp"
         android:textStyle="bold" />
 

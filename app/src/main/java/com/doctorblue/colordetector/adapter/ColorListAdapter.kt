@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
-class ColorListAdapter(private val context: Context) :
+class ColorListAdapter(private val context: Context, private val onItemClick: (UserColor) -> Unit) :
     RecyclerView.Adapter<ColorListAdapter.ColorListViewHolder>() {
 
     private val viewPool = RecyclerView.RecycledViewPool()
@@ -32,7 +32,7 @@ class ColorListAdapter(private val context: Context) :
             txtTitle.text = name
 
             val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            val adapter = ColorAdapter(context, ColorAdapter.Geometry.SQUARE)
+            val adapter = ColorAdapter(context, ColorAdapter.Geometry.SQUARE, onItemClick)
             rvColor.layoutManager = layoutManager
             rvColor.setHasFixedSize(true)
             rvColor.adapter = adapter

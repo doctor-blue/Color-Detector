@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.doctorblue.colordetector.R
 import com.doctorblue.colordetector.adapter.ColorListAdapter
 import com.doctorblue.colordetector.database.ColorViewModel
+import com.doctorblue.colordetector.dialog.ColorDetailDialog
+import com.doctorblue.colordetector.model.UserColor
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_colors.*
 
@@ -34,7 +36,10 @@ class ColorsFragment() : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val colorListAdapter = ColorListAdapter(requireContext())
+        val colorListAdapter = ColorListAdapter(requireContext()) {
+            val detailDialog = ColorDetailDialog(requireContext(), it, deleteColor)
+            detailDialog.show()
+        }
 
         colorViewModel.getAllColor().observe(viewLifecycleOwner, { colors ->
             val names = LinkedHashSet(colors.map { it.name }).toList()
@@ -49,5 +54,8 @@ class ColorsFragment() : BottomSheetDialogFragment() {
         rv_color_list.adapter = colorListAdapter
     }
 
+    private val deleteColor: (UserColor) -> Unit = {
+        colorViewModel.deleteColor(it)
+    }
 
 }
