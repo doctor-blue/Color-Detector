@@ -15,7 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_colors.*
 
 
-class ColorsFragment() : BottomSheetDialogFragment() {
+class ColorsFragment : BottomSheetDialogFragment() {
 
     private val colorViewModel: ColorViewModel by lazy {
         ViewModelProvider(
