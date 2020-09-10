@@ -32,7 +32,4 @@ class TimerScope {
     var isCanceled: Boolean = false
         private set
 
-    fun cancel() {
-        isCanceled = true
-    }
 }

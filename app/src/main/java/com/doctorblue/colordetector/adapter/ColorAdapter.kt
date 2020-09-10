@@ -16,7 +16,7 @@ class ColorAdapter(
     RecyclerView.Adapter<ColorAdapter.ColorViewHolder>() {
     var colors: List<UserColor> = listOf()
 
-    class ColorViewHolder(private val cardView: ColorCardView, private val context: Context) :
+    class ColorViewHolder(private val cardView: ColorCardView) :
         RecyclerView.ViewHolder(cardView) {
         fun onBind(color: UserColor, onItemClick: (UserColor) -> Unit) {
 
@@ -35,7 +35,7 @@ class ColorAdapter(
             cardView.radius = 0f
         }
 
-        return ColorViewHolder(cardView, context)
+        return ColorViewHolder(cardView)
     }
 
     override fun onBindViewHolder(holder: ColorViewHolder, position: Int) {

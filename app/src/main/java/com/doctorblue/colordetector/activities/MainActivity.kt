@@ -8,10 +8,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -23,9 +21,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.doctorblue.colordetector.R
 import com.doctorblue.colordetector.adapter.ColorAdapter
 import com.doctorblue.colordetector.base.BaseActivity
@@ -49,7 +44,6 @@ class MainActivity : BaseActivity() {
 
     companion object {
         private const val TAG = "CameraXBasic"
-        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 26
         private val REQUIRED_PERMISSIONS =
             arrayOf(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -258,26 +252,26 @@ class MainActivity : BaseActivity() {
                 btn_show_camera.visibility = View.VISIBLE
                 isImageShown = true
             }
-            if (data?.data !=null){
+            if (data?.data != null) {
                 image_view.setImageURI(data.data)
                 startDetectColorFromImage(decodeUriToBitmap(data.data!!))
             }
 
 
-         /*   Glide.with(this)
-                .asBitmap()
-                .load(data?.data)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(
-                        resource: Bitmap,
-                        transition: Transition<in Bitmap>?
-                    ) {
-                        image_view.setImageBitmap(resource)
-                        startDetectColorFromImage(resource)
-                    }
+            /*   Glide.with(this)
+                   .asBitmap()
+                   .load(data?.data)
+                   .into(object : CustomTarget<Bitmap>() {
+                       override fun onResourceReady(
+                           resource: Bitmap,
+                           transition: Transition<in Bitmap>?
+                       ) {
+                           image_view.setImageBitmap(resource)
+                           startDetectColorFromImage(resource)
+                       }
 
-                    override fun onLoadCleared(placeholder: Drawable?) = Unit
-                })*/
+                       override fun onLoadCleared(placeholder: Drawable?) = Unit
+                   })*/
         }
     }
 
@@ -399,7 +393,7 @@ class MainActivity : BaseActivity() {
         cameraExecutor.shutdown()
     }
 
-    fun decodeUriToBitmap(uri: Uri): Bitmap = try {
+    private fun decodeUriToBitmap(uri: Uri): Bitmap = try {
         val inputStream = contentResolver.openInputStream(uri)
         BitmapFactory.decodeStream(inputStream)
     } catch (e: Exception) {

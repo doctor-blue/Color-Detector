@@ -12,10 +12,6 @@ class ColorViewModel(application: Application) : AndroidViewModel(application) {
         colorRepository.insertColor(color)
     }
 
-    fun insertAllColor(colors: List<UserColor>) = viewModelScope.launch {
-        colorRepository.insertAllColor(colors)
-    }
-
     fun deleteColor(color: UserColor) = viewModelScope.launch {
         colorRepository.deleteColor(color)
     }

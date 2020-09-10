@@ -11,10 +11,6 @@ class ColorRepository(application: Application) {
         colorDao.insertColor(color)
     }
 
-    suspend fun insertAllColor(colors: List<UserColor>) {
-        colorDao.insertAllColor(colors)
-    }
-
     suspend fun deleteColor(color: UserColor) {
         colorDao.deleteColor(color)
     }

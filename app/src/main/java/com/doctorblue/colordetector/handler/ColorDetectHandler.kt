@@ -18,10 +18,6 @@ class ColorDetectHandler {
 
     private var name: String = ""
 
-    private var h: String = ""
-    private var s: String = ""
-    private var l: String = ""
-
     private var bitmap: Bitmap? = null
 
     private fun reset() {
