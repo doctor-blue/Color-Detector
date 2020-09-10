@@ -1,4 +1,4 @@
-# Color-Detector
+# Color Detector
 Android Native app helps to detect colors on camera and photos from phone
 
 
