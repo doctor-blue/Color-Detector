@@ -5,9 +5,13 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -254,9 +258,13 @@ class MainActivity : BaseActivity() {
                 btn_show_camera.visibility = View.VISIBLE
                 isImageShown = true
             }
+            if (data?.data !=null){
+                image_view.setImageURI(data.data)
+                startDetectColorFromImage(decodeUriToBitmap(data.data!!))
+            }
 
 
-            Glide.with(this)
+         /*   Glide.with(this)
                 .asBitmap()
                 .load(data?.data)
                 .into(object : CustomTarget<Bitmap>() {
@@ -269,7 +277,7 @@ class MainActivity : BaseActivity() {
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) = Unit
-                })
+                })*/
         }
     }
 
@@ -389,6 +397,14 @@ class MainActivity : BaseActivity() {
         timerTask?.cancel()
         cameraProvider.unbindAll()
         cameraExecutor.shutdown()
+    }
+
+    fun decodeUriToBitmap(uri: Uri): Bitmap = try {
+        val inputStream = contentResolver.openInputStream(uri)
+        BitmapFactory.decodeStream(inputStream)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        (image_view.drawable as BitmapDrawable).bitmap
     }
 
 }
