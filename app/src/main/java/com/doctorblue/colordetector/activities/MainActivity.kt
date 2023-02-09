@@ -10,10 +10,12 @@ import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -36,12 +38,31 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
+import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
 class MainActivity : BaseActivity() {
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+    }
+
+    //val textToSpeech = TextToSpeech(this,TextToSpeech.OnInitListener)
+
+    /*fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            val ttsLang = textToSpeech.setLanguage(Locale.getDefault())
+            if (ttsLang == TextToSpeech.LANG_MISSING_DATA || ttsLang == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Toast.makeText(this, "We can't support your language", Toast.LENGTH_LONG).show()
+            }
+        }
+        else {
+            Toast.makeText(this, "TTS Initialization failed!", Toast.LENGTH_SHORT).show()
+        }
+    }*/
     companion object {
         private const val TAG = "CameraXBasic"
         private const val REQUEST_CODE_PERMISSIONS = 26
@@ -62,8 +83,8 @@ class MainActivity : BaseActivity() {
     }
     private var isBackCamera = true
 
-    // Select back camera as a default
-    private var cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+    // Select front camera as a default
+    private var cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
     private val colorDetectHandler = ColorDetectHandler()
 
@@ -324,6 +345,8 @@ class MainActivity : BaseActivity() {
                 txt_hex.text = currentColor.hex
                 card_color.setCardBackgroundColor(Color.parseColor(currentColor.hex))
             }
+
+
         }
 
 
